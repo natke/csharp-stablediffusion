@@ -34,8 +34,7 @@
 		<PackageReference Include="NumSharp" Version="0.30.0" />
 		<PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
 		<PackageReference Include="Microsoft.ML" Version="2.0.1" />
-		<PackageReference Include="Microsoft.ML.OnnxRuntime.Gpu" Version="1.15.0" />
-		<PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.15.0" />
+	    <PackageReference Include="Microsoft.ML.OnnxRuntime.Managed" Version="1.17.0-dev-20231211-0346-8f199e78b9" />
 	</ItemGroup>
 	<ItemGroup Label="FilesToCopy">
 		<Content Include="StableDiffusion.ML.OnnxRuntime.targets" PackagePath="build/StableDiffusion.ML.OnnxRuntime.targets" />

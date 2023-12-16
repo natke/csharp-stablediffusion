@@ -16,7 +16,7 @@ namespace StableDiffusion
             var config = new StableDiffusionConfig
             {
                 // Number of denoising steps
-                NumInferenceSteps = 15,
+                NumInferenceSteps = 5,
                 // Scale for classifier-free guidance
                 GuidanceScale = 7.5,
                 // Set your preferred Execution Provider. Currently (GPU, DirectML, CPU) are supported in this project.
@@ -27,10 +27,10 @@ namespace StableDiffusion
                 // Set GPU Device ID.
                 DeviceId = 0,
                 // Update paths to your models
-                TextEncoderOnnxPath = @"C:\code\StableDiffusion\StableDiffusion\models\text_encoder\model.onnx",
-                UnetOnnxPath = @"C:\code\StableDiffusion\StableDiffusion\models\unet\model.onnx",
-                VaeDecoderOnnxPath = @"C:\code\StableDiffusion\StableDiffusion\models\vae_decoder\model.onnx",
-                SafetyModelPath = @"C:\code\StableDiffusion\StableDiffusion\models\safety_checker\model.onnx",
+                TextEncoderOnnxPath = @"models\text_encoder\model.onnx",
+                UnetOnnxPath = @"models\unet\model.onnx",
+                VaeDecoderOnnxPath = @"models\vae_decoder\model.onnx",
+                SafetyModelPath = @"models\safety_checker\model.onnx",
             };
 
             // Inference Stable Diff

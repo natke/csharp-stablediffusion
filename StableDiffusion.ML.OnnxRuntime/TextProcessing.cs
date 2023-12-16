@@ -16,12 +16,12 @@ namespace StableDiffusion.ML.OnnxRuntime
             var uncondEmbedding = TextEncoder(uncondInputTokens, config).ToArray();
 
             // Concant textEmeddings and uncondEmbedding
-            DenseTensor<float> textEmbeddings = new DenseTensor<float>(new[] { 2, 77, 768 });
+            DenseTensor<float> textEmbeddings = new DenseTensor<float>(new[] { 2, 77, 2048 });
 
             for (var i = 0; i < textPromptEmbeddings.Length; i++)
             {
-                textEmbeddings[0, i / 768, i % 768] = uncondEmbedding[i];
-                textEmbeddings[1, i / 768, i % 768] = textPromptEmbeddings[i];
+                textEmbeddings[0, i / 2048, i % 2048] = uncondEmbedding[i];
+                textEmbeddings[1, i / 2048, i % 2048] = textPromptEmbeddings[i];
             }
             return textEmbeddings;
         }
