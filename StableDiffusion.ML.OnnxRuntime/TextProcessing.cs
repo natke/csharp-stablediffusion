@@ -3,6 +3,7 @@ using Microsoft.ML.OnnxRuntime;
 
 namespace StableDiffusion.ML.OnnxRuntime
 {
+
     public static class TextProcessing
     {
         public static DenseTensor<float> PreprocessText(String prompt, StableDiffusionConfig config)
@@ -25,6 +26,7 @@ namespace StableDiffusion.ML.OnnxRuntime
             }
             return textEmbeddings;
         }
+
         public static int[] TokenizeText(string text, StableDiffusionConfig config)
         {
             // Create session options for custom op of extensions
@@ -38,9 +40,7 @@ namespace StableDiffusion.ML.OnnxRuntime
             // Run session and send the input data in to get inference output. 
             var tokens = tokenizeSession.Run(inputString);
 
-
             var inputIds = (tokens.ToList().First().Value as IEnumerable<long>).ToArray();
-            Console.WriteLine(String.Join(" ", inputIds));
 
             // Cast inputIds to Int32
             var InputIdsInt = inputIds.Select(x => (int)x).ToArray();
@@ -54,7 +54,6 @@ namespace StableDiffusion.ML.OnnxRuntime
             }
 
             return InputIdsInt;
-
         }
 
         public static int[] CreateUncondInput()

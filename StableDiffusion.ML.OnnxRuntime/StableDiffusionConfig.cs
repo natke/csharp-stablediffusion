@@ -4,6 +4,7 @@ namespace StableDiffusion.ML.OnnxRuntime
 {
     public class StableDiffusionConfig
     {
+        public bool isStableDiffusionXL = false;
         
         public enum ExecutionProvider
         {
@@ -22,6 +23,7 @@ namespace StableDiffusion.ML.OnnxRuntime
 
         public string TokenizerOnnxPath = "cliptokenizer.onnx";
         public string TextEncoderOnnxPath = "";
+        public string TextEncoder2OnnxPath = "";
         public string UnetOnnxPath = "";
         public string VaeDecoderOnnxPath = "";
         public string SafetyModelPath = "";

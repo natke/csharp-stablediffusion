@@ -1,4 +1,5 @@
 ﻿using StableDiffusion.ML.OnnxRuntime;
+using System.Runtime.InteropServices;
 
 namespace StableDiffusion
 {
@@ -15,6 +16,9 @@ namespace StableDiffusion
 
             var config = new StableDiffusionConfig
             {
+                // Set stable diffusion XL variant
+                isStableDiffusionXL = true,
+
                 // Number of denoising steps
                 NumInferenceSteps = 5,
                 // Scale for classifier-free guidance
@@ -28,12 +32,26 @@ namespace StableDiffusion
                 DeviceId = 0,
                 // Update paths to your models
                 TextEncoderOnnxPath = @"models\text_encoder\model.onnx",
+                TextEncoder2OnnxPath = @"models\text_encoder_2\model.onnx",
                 UnetOnnxPath = @"models\unet\model.onnx",
-                VaeDecoderOnnxPath = @"models\vae_decoder\model.onnx",
-                SafetyModelPath = @"models\safety_checker\model.onnx",
+                VaeDecoderOnnxPath = @"models\vae_decoder\model.onnx"
             };
 
-            // Inference Stable Diff
+            // Run stable diffusion pipeline
+            // 1. Encode prompt
+            // Preprocess text
+            var textEmbeddings = TextProcessing.PreprocessText(prompt, config);
+            var textEmbeddings2 = TextProcessing2.PreprocessText(prompt, config);
+
+
+            // 2. Add time ids
+
+            // 3. Denoise latent
+
+            // 4. Decode latent
+
+
+
             var image = UNet.Inference(prompt, config);
 
             // If image failed or was unsafe it will return null.
