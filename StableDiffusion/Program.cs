@@ -41,6 +41,9 @@ namespace StableDiffusion
             // 1. Encode prompt
             // Preprocess text
             var textEmbeddings = TextProcessing.PreprocessText(prompt, config);
+
+            Console.WriteLine(textEmbeddings);
+
             var textEmbeddings2 = TextProcessing2.PreprocessText(prompt, config);
 
 

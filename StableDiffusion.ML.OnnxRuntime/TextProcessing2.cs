@@ -9,27 +9,34 @@ namespace StableDiffusion.ML.OnnxRuntime
         public static DenseTensor<float> PreprocessText(String prompt, StableDiffusionConfig config)
         {
             // Load the tokenizer and text encoder to tokenize and encode the text.
-            var textTokenized = TokenizeText(prompt, config);
-            var textPromptEmbeddings = TextEncoder(textTokenized, config);
+            IEnumerable<OrtValue> textTokenized = TokenizeText(prompt, config);
+            OrtValue textPromptEmbeddings = TextEncoder(textTokenized, config)["text_embeds"];
+            var textPromptEmbeddingsSpan = textPromptEmbeddings.GetTensorDataAsSpan<float>();
+            var textPromptEmbeddingsLength = textPromptEmbeddingsSpan.Length;
 
             // Create uncond_input of blank tokens
-            var uncondInputTokens = CreateUncondInput();
-            var uncondEmbedding = TextEncoder(uncondInputTokens, config);
+            IEnumerable<OrtValue> uncondInputTokens = CreateUncondInput();
+            OrtValue uncondEmbeddings = TextEncoder(uncondInputTokens, config)["text_embeds"];
+            var uncondEmbeddingsSpan = uncondEmbeddings.GetTensorDataAsSpan<float>();
+            var uncondEmbeddingsLength = uncondEmbeddingsSpan.Length;
 
-            // Concant textEmeddings and uncondEmbedding
-            DenseTensor<float> textEmbeddings = new DenseTensor<float>(new[] { 2, 77, 2048 });
+            // Concat textEmeddings and uncondEmbedding
+            DenseTensor<float> textEmbeddings = new DenseTensor<float>(new[] { 1, uncondEmbeddingsLength + textPromptEmbeddingsLength});
 
-            // TODO Figure out how to concatenate OrtValues
-            for (var i = 0; i < textPromptEmbeddings.GetTensorDataAsSpan<long>().Length; i++)
+            for (var i = 0; i < uncondEmbeddingsLength; i++)
             {
-                textEmbeddings[0, i / 2048, i % 2048] = uncondEmbedding.GetTensorDataAsSpan<long>()[i];
-                textEmbeddings[1, i / 2048, i % 2048] = textPromptEmbeddings.GetTensorDataAsSpan<long>()[i];
+                textEmbeddings[0, i] = uncondEmbeddingsSpan[i];
+            }
+
+            for (var i = uncondEmbeddingsLength;  i < uncondEmbeddingsLength + textPromptEmbeddingsLength; i++)
+            {
+                textEmbeddings[0, i] = textPromptEmbeddingsSpan[i - uncondEmbeddingsLength];
             }
             return textEmbeddings;
         }
-        public static OrtValue TokenizeText(string text, StableDiffusionConfig config)
+        public static IEnumerable<OrtValue> TokenizeText(string text, StableDiffusionConfig config)
         {
-            long[] shape = { 1 };
+            long[] shape = { 2 };
 
             using var inputTensor = OrtValue.CreateTensorWithEmptyStrings(OrtAllocator.DefaultInstance, shape);
 
@@ -42,15 +49,12 @@ namespace StableDiffusion.ML.OnnxRuntime
             // Create an InferenceSession from the onnx clip tokenizer.
             var tokenizeSession = new InferenceSession(config.TokenizerOnnxPath, sessionOptions);
 
+            // Run session
             var input = new Dictionary<string, OrtValue> {
                 { "string_input",  inputTensor }
             };
-
-
             using var runOptions = new RunOptions();
 
-
-            // Run session and send the input data in to get inference output. 
             var outputs = tokenizeSession.Run(runOptions, input, tokenizeSession.OutputNames);
 
             // TODO Figure out how to pad OrtValues
@@ -60,15 +64,20 @@ namespace StableDiffusion.ML.OnnxRuntime
             //if (inputIds.Length < modelMaxLength)
             //{
             //    var pad = Enumerable.Repeat(49407, 77 - inputIds.Length).ToArray();
-                //paddedInputs = inputIds.Concat(pad).ToArray();
+            //paddedInputs = inputIds.Concat(pad).ToArray();
             //}
 
-            return outputs[0];
+            var output0 = outputs.ElementAt(0);
+            var tensorTypeAndShape = output0.GetTensorTypeAndShape();
+
+            return outputs;
 
         }
 
-        public static OrtValue CreateUncondInput()
+        public static IEnumerable<OrtValue> CreateUncondInput()
         {
+            List<OrtValue> returnVal = new List<OrtValue>();
+         
             // Create an array of empty tokens for the unconditional input.
             var blankTokenValue = 49407;
             var modelMaxLength = 77;
@@ -80,20 +89,19 @@ namespace StableDiffusion.ML.OnnxRuntime
                 inputIds[i] = blankTokenValue;
             }
             
-            long[] inputIdsShape = { modelMaxLength };
+            long[] inputIdsShape = { 1, modelMaxLength };
 
-            return OrtValue.CreateTensorValueFromMemory(inputIds, inputIdsShape);
+            returnVal.Add(OrtValue.CreateTensorValueFromMemory(inputIds, inputIdsShape));
 
+            return returnVal;
             
         }
 
-        public static OrtValue TextEncoder(OrtValue inputIds, StableDiffusionConfig config)
+        public static Dictionary<string, OrtValue> TextEncoder(IEnumerable<OrtValue> inputs, StableDiffusionConfig config)
         {
             var input = new Dictionary<string, OrtValue> {
-                { "input_ids",  inputIds }
+                { "input_ids",  inputs.ElementAt(0) }
             };
-
-            Console.WriteLine(inputIds.GetTensorTypeAndShape());
 
             // Set CUDA EP
             var sessionOptions = config.GetSessionOptionsForEp();
@@ -105,11 +113,17 @@ namespace StableDiffusion.ML.OnnxRuntime
 
             var outputs = encodeSession.Run(runOptions, input, encodeSession.OutputNames);
 
+            var returnVal = new Dictionary<string, OrtValue> {
+                { "text_embeds", outputs.ElementAt(0) },
+                { "last_hiddenstate", outputs.ElementAt(1) }
+            };
+
+
             //var lastHiddenState = (encoded.ToList().First().Value as IEnumerable<float>).ToArray();
             //var lastHiddenStateTensor = TensorHelper.CreateTensor(lastHiddenState.ToArray(), new[] { 1, 77, 768 });
 
             //return lastHiddenStateTensor;
-            return outputs[0];
+            return returnVal;
 
         }
 
