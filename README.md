@@ -61,3 +61,6 @@ __________________________
 - [Get Started with C# in ONNX Runtime](https://onnxruntime.ai/docs/get-started/with-csharp.html)
 - [Hugging Face Stable Diffusion Blog](https://huggingface.co/blog/stable_diffusion)
 - [Stable Diffusion C# Tutorial for this Repo](https://onnxruntime.ai/docs/tutorials/csharp/stable-diffusion-csharp.html)
+
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StableDiffusion.ML.OnnxRuntime", "StableDiffusion.ML.OnnxRuntime\StableDiffusion.ML.OnnxRuntime.csproj", "{34D8EADB-8E26-4487-AA4D-EED053C29016}"
+EndProject
