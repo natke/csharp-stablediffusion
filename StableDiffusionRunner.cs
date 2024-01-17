@@ -61,11 +61,7 @@ internal class StableDiffusionRunner : IHostedService
             var schedulerOptions = new SchedulerOptions
             {
                 Seed = Random.Shared.Next(),
-                GuidanceScale = 7.5f,
-                InferenceSteps = 30,
-                Height = 512,
-                Width = 512,
-                SchedulerType = SchedulerType.LMS,
+                SchedulerType = SchedulerType.EulerAncestral
             };
 
             // Generate Image Example
