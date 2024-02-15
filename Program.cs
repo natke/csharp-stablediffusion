@@ -10,6 +10,12 @@ namespace StableDiffusionConsoleApp
     {
         static async Task Main(string[] _)
         {
+            Console.CancelKeyPress += delegate(object? sender, ConsoleCancelEventArgs e) {
+                e.Cancel = true;
+                System.Console.WriteLine("Exiting...");
+                System.Environment.Exit(0);
+            };
+        
             var builder = Host.CreateApplicationBuilder();
             builder.Logging.ClearProviders();
             builder.Services.AddLogging((loggingBuilder) => loggingBuilder.SetMinimumLevel(LogLevel.Error));

@@ -6,7 +6,7 @@
                <ImplicitUsings>enable</ImplicitUsings>
                <Nullable>disable</Nullable>
                <PlatformTarget>x64</PlatformTarget>
-               <Configurations>Debug;Release</Configurations>
+               <Configurations>Debug</Configurations>
                <Platforms>x64</Platforms>
        </PropertyGroup>
 
@@ -14,6 +14,8 @@
 	    <Content Include="models\**">
 	        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
+	    <None Remove="models\stable-diffusion-xl-base-1.0-Olive-Onnx\tokenizer\cliptokenizer.onnx" />
+	    <None Remove="models\stable-diffusion-xl-base-1.0-Olive-Onnx\tokenizer_2\cliptokenizer.onnx" />
 		  <None Update="appsettings.json">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
@@ -25,11 +27,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="OnnxStack.StableDiffusion" Version="0.15.0" />
+      <PackageReference Include="OnnxStack.StableDiffusion" Version="0.17.0" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.ML.OnnxRuntime.DirectML" Version="1.16.3" />
+      <PackageReference Include="Microsoft.ML.OnnxRuntime.DirectML" Version="1.17.0" />
     </ItemGroup>
 
 </Project>
